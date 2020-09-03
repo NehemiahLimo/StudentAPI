@@ -21,35 +21,62 @@ namespace StudentAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Save([FromBody] Student data)
+        public async Task<IActionResult> Save([FromBody] Student _student)
         {
-            if (data == null)
+            if (_student == null)
             {
                 return BadRequest();
             }
-            db.Save(data);
-            return Ok(data);
+            POJO model = await db.Save(_student);
+            if(model == null)
+            {
+                return NotFound();
+            }
+            
+            return Ok(model);
         }
 
         [HttpGet("{Id}")]
-        public IActionResult GetStudent(int? Id)
+        public async Task<IActionResult> GetStudent(int? Id)
         {
-            Student data = db.GetStudent(Id);
-            return Ok(data);
+            if (Id == null)
+            {
+                return BadRequest();
+            }
+
+            Student model = await db.GetStudent(Id);
+            if(model == null)
+            {
+                return NotFound();
+            }
+            return Ok(model);
         }
 
         [HttpGet]
         public IActionResult GetStudents()
         {
             IQueryable<Student> data = db.GetStudents;
+            if (data == null)
+            {
+                return NotFound();
+            }
             return Ok(data);
         }
 
         [HttpDelete]
-        public IActionResult Delete(int? Id)
+        public async Task<IActionResult> Delete(int? Id)
         {
-            db.Delete(Id);
-            return Ok();
+            if (Id == null)
+            {
+                return BadRequest();
+            }
+            POJO model = await db.DeleteAsync(Id);
+            if (model == null)
+            {
+                return NotFound();
+            }
+           // db.Delete(Id);
+            return Ok(model);
         }
     }
 }
